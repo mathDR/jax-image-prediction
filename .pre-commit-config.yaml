@@ -1,0 +1,21 @@
+# pre-commit hooks require a user to have installed `pre-commit`:
+#   $ brew install pre-commit
+# Then install the hooks within the repo:
+#   $ cd /PATH/TO/base-python3 (or whatever your package is located)
+#   $ pre-commit install
+# You only need to run the `install` once per repo
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      # removes UTF-8 byte order marker
+      - id: fix-byte-order-marker
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      # " -> '
+      - id: double-quote-string-fixer
+      # ensures files are either empty or end with a blank line
+      - id: end-of-file-fixer
