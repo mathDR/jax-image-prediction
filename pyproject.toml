@@ -55,10 +55,7 @@ select = [
     "NPY", # numpy
 ]
 ignore = [
-    {% if not cookiecutter.enforced_docstrings %}"D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # undocumented public class/func/package etc.
-    {%- endif -%}
-    {% if not cookiecutter.enforced_parameter_docstrings %}"D417", # documentation for every function parameter if at least one is provided
-{%- endif %}
+    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", "D417"
 ]
 
 [tool.ruff.format]
