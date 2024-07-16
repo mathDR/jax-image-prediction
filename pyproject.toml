@@ -1,40 +1,90 @@
+# --- Package -------------------------------------------------------------------------------------
 [build-system]
-requires = ['setuptools>=45', 'wheel']
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name =  "jax-image-prediction"
+version = "0.1.0"
+description = "A simple embodied image predictor in jax."
+readme = "README.md"
+authors = [
+    {name = "Daniel Marthaler"},
+]
+maintainers = [
+    {name = "Daniel Marthaler"},
+]
+requires-python = ">=3.11"
+dependencies = []
 
-[tool.black]
-skip-string-normalization = true
-line-length = 100
-target-version = ['py39']
-include = '\.pyi?$'
-
-
-# see https://black.readthedocs.io/en/stable/compatible_configs.html#formats
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
-line_length = 100
-known_first_party = ["{{cookiecutter.primary_module}}"]
-
-# see https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-
-[tool.pydocstyle]
-convention = "google"
-add_ignore = [
-  'D104', # Missing docstring in public package (don't force everyone to comment __init__.py)
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "coveralls",
+    "pytest",
 ]
 
-[tool.flake8]
-max-complexity = 10
-exclude = ".svn,CVS,.bzr,.hg,.git,__pycache__,.tox,.eggs,*.egg,__init__.py,docs"
-# These settings are required for compatibility with black
-# See https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8
-extend-ignore = "E203"
-max-line-length = 100
+[project.urls]
+Repository = "https://https://github.com/mathDR/jax-image-prediction.git"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+# --- Ruff ----------------------------------------------------------------------------------------
+[tool.ruff]
+extend-include = ["*.ipynb"]
+
+line-length = 100
+target-version = "3.11"
+
+# See https://docs.astral.sh/ruff/rules/
+[tool.ruff.lint]
+select = [
+    # defaults
+    "E4", "E7", "E9", "F",
+    "D", # pydocstyle
+    "N", # pep8 naming
+    "UP", # pyuupdate
+    "RUF", # ruff rules
+    "I", # i-sort
+    "PD", # pandas-vet
+    "NPY", # numpy
+]
+ignore = [
+    {% if not cookiecutter.enforced_docstrings %}"D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # undocumented public class/func/package etc.
+    {%- endif -%}
+    {% if not cookiecutter.enforced_parameter_docstrings %}"D417", # documentation for every function parameter if at least one is provided
+{%- endif %}
+]
+
+[tool.ruff.format]
+# As of Ruff v0.4.1, this setting is false by default (but will be true in the future so adopting
+# the future default)
+docstring-code-format = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+# --- mypy ----------------------------------------------------------------------------------------
+# see https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+
+# --- tox -----------------------------------------------------------------------------------------
+[tool.tox]
+legacy_tox_ini = """
+  [tox]
+  envlist = 3.11
+  isolated_build = True
+
+  [testenv]
+  deps=
+  commands=
+    pip install -e .[dev] --progress-bar off
+    coverage run --source jax-image-prediction -m pytest
+"""

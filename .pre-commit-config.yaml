@@ -6,16 +6,17 @@
 # You only need to run the `install` once per repo
 
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
     hooks:
-      - id: trailing-whitespace
-        args: [--markdown-linebreak-ext=md]
-      # removes UTF-8 byte order marker
-      - id: fix-byte-order-marker
-      - id: check-executables-have-shebangs
-      - id: check-merge-conflict
-      # " -> '
-      - id: double-quote-string-fixer
-      # ensures files are either empty or end with a blank line
-      - id: end-of-file-fixer
+      - id: ruff
+        types_or: [ python, pyi, jupyter ]
+        args: [ --fix ]
+      - id: ruff-format
+        types_or: [ python, pyi, jupyter ]
+
+  # Runs type checking. See pyproject.toml for config options.
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
