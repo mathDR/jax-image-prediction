@@ -278,3 +278,51 @@ class SimVP_Model(eqx.Module):
         Y = vmap(self.dec)(hid, skip)
         Y = Y.reshape(B, T, C, H, W)
         return Y
+
+
+class SimVP_Model_No_Hid(eqx.Module):
+    enc: Encoder
+    dec: Decoder
+
+    def __init__(
+        self,
+        key: jax.random.PRNGKey,
+        in_shape: Tuple,
+        hid_S: int = 16,
+        hid_T: int = 256,
+        N_S: int = 4,
+        N_T: int = 4,
+        model_type: str = "gSTA",
+        spatio_kernel_enc: int = 3,
+        spatio_kernel_dec: int = 3,
+        **kwargs,
+    ) -> None:
+        super(SimVP_Model_No_Hid, self).__init__()
+        T, C, H, W = in_shape
+        H, W = int(H / 2 ** (N_S / 2)), int(
+            W / 2 ** (N_S / 2)
+        )  # downsample 1 / 2**(N_S/2)
+        keys = jax.random.split(key, 2)
+        self.enc = Encoder(
+            keys[0],
+            C,
+            hid_S,
+            N_S,
+            spatio_kernel_enc,
+        )
+        self.dec = Decoder(
+            keys[1],
+            hid_S,
+            C,
+            N_S,
+            spatio_kernel_dec,
+        )
+
+    def __call__(self, x_raw: Array, **kwargs) -> Array:
+        B, T, C, H, W = x_raw.shape
+        x = x_raw.reshape(B * T, C, H, W)
+        embed, skip = vmap(self.enc)(x)
+
+        Y = vmap(self.dec)(embed, skip)
+        Y = Y.reshape(B, T, C, H, W)
+        return Y
